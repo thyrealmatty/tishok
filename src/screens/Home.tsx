@@ -1,6 +1,7 @@
+import Button from "../components/Button";
 import { greetingFor } from "../lib/greeting";
 
-export default function Home({ name }: { name: string }) {
+export default function Home({ name, onSignOut }: { name: string; onSignOut?: () => void }) {
   const { title, subline } = greetingFor();
   const personal = name.trim() ? title.replace(/\.$/, `, ${name.trim()}.`) : title;
 
@@ -36,6 +37,7 @@ export default function Home({ name }: { name: string }) {
         <h2>Your first shared memory</h2>
         <p>When you and your partner add a memory, it will live here. Start with a moment you are thankful for.</p>
       </section>
+      {onSignOut && <Button variant="quiet" onClick={onSignOut} style={{ marginTop: "1.5rem" }}>Sign out</Button>}
     </>
   );
 }

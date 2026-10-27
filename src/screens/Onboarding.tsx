@@ -6,9 +6,9 @@ import ConnectRings from "../components/ConnectRings";
 type Step = "welcome" | "name" | "stage" | "invite" | "connected";
 const STAGES = ["Dating", "Engaged", "Married", "Parenting together"];
 
-type Props = { name: string; onName: (n: string) => void; onDone: () => void };
+type Props = { name: string; onName: (n: string) => void; onDone: (name: string, stage: string) => void; real?: boolean };
 
-export default function Onboarding({ name, onName, onDone }: Props) {
+export default function Onboarding({ name, onName, onDone, real = false }: Props) {
   const [step, setStep] = useState<Step>("welcome");
   const [stage, setStage] = useState("Dating");
   const [joined, setJoined] = useState(false);
@@ -30,7 +30,7 @@ export default function Onboarding({ name, onName, onDone }: Props) {
           <p className="subline">Just your first name. Only you and your partner will see it.</p>
           <input className="field" value={name} onChange={(e) => onName(e.target.value)}
             placeholder="First name" aria-label="First name" autoComplete="given-name" />
-          <p className="status">Prototype: sign-in is not connected yet, so nothing is saved to an account.</p>
+          {!real && <p className="status">Prototype: sign-in is not connected yet, so nothing is saved to an account.</p>}
           <div className="actions">
             <Button disabled={!name.trim()} onClick={() => setStep("stage")}>Continue</Button>
           </div>
@@ -47,7 +47,7 @@ export default function Onboarding({ name, onName, onDone }: Props) {
                 className="choice" onClick={() => setStage(s)}>{s}</button>
             ))}
           </div>
-          <div className="actions"><Button onClick={() => setStep("invite")}>Continue</Button></div>
+          <div className="actions"><Button onClick={() => (real ? onDone(name, stage) : setStep("invite"))}>Continue</Button></div>
         </>
       )}
 
@@ -64,7 +64,7 @@ export default function Onboarding({ name, onName, onDone }: Props) {
             <Button onClick={() => { setJoined(true); setTimeout(() => setStep("connected"), 1700); }}>
               Preview the connection
             </Button>
-            <Button variant="quiet" onClick={onDone}>Do this later</Button>
+            <Button variant="quiet" onClick={() => onDone(name, stage)}>Do this later</Button>
           </div>
         </>
       )}
@@ -74,7 +74,7 @@ export default function Onboarding({ name, onName, onDone }: Props) {
           <ConnectRings joined />
           <h1 className="greeting">Better together.</h1>
           <p className="subline">This was a preview. Real invitations arrive with accounts in the next phase.</p>
-          <div className="actions"><Button onClick={onDone}>Enter Tìshòk</Button></div>
+          <div className="actions"><Button onClick={() => onDone(name, stage)}>Enter Tìshòk</Button></div>
         </>
       )}
     </main>
