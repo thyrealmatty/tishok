@@ -1,0 +1,56 @@
+/* Tìshòk design tokens. Change a value here and the whole app follows. */
+:root {
+  --ivory: #f7f1e6;
+  --cream: #efe6d6;
+  --plum: #2a1a33;
+  --plum-deep: #1e1326;
+  --rose: #c98a8f;
+  --blush: #ecd3d0;
+  --champagne: #d8b77a;
+  --lavender: #b7a8d4;
+  --sage: #a9b895;
+  --charcoal: #3a3036;
+
+  --bg: var(--ivory);
+  --surface: #fffaf1;
+  --surface-line: rgba(58, 48, 54, 0.1);
+  --text: var(--charcoal);
+  --text-soft: rgba(58, 48, 54, 0.68);
+  --accent: #a8626b;
+  --glow-a: rgba(201, 138, 143, 0.28);
+  --glow-b: rgba(183, 168, 212, 0.26);
+
+  --font-serif: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2.25rem;
+  --space-7: 3.5rem;
+
+  --radius-card: 22px;
+  --radius-control: 14px;
+
+  --shadow-soft: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 12px 32px -18px rgba(58, 30, 50, 0.35);
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-quick: 160ms;
+  --dur-calm: 520ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: var(--plum-deep);
+    --surface: #2b1d35;
+    --surface-line: rgba(247, 241, 230, 0.1);
+    --text: #f2e9dc;
+    --text-soft: rgba(242, 233, 220, 0.68);
+    --accent: #e0a3a8;
+    --glow-a: rgba(201, 138, 143, 0.22);
+    --glow-b: rgba(183, 168, 212, 0.16);
+    --shadow-soft: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 16px 36px -18px rgba(0, 0, 0, 0.7);
+  }
+}
