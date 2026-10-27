@@ -2,11 +2,13 @@ import { useState } from "react";
 import BottomNav, { type TabId } from "./components/BottomNav";
 import Logo from "./components/Logo";
 import Auth from "./screens/Auth";
+import Connect from "./screens/Connect";
 import Home from "./screens/Home";
 import Onboarding from "./screens/Onboarding";
 import Placeholder from "./screens/Placeholder";
 import { supabase } from "./lib/supabase";
 import { useAuth } from "./lib/useAuth";
+import { useCouple } from "./lib/useCouple";
 
 const FLAG = "tishok-onboarded";
 const seen = () => { try { return localStorage.getItem(FLAG) === "1"; } catch { return false; } };
@@ -15,18 +17,22 @@ const STAGE_VALUE: Record<string, string> = {
   Dating: "dating", Engaged: "engaged", Married: "married", "Parenting together": "parenting",
 };
 
-function MainApp({ name, onSignOut }: { name: string; onSignOut?: () => void }) {
+function MainApp({ name, onSignOut, userId }: { name: string; onSignOut?: () => void; userId?: string }) {
   const [tab, setTab] = useState<TabId>("home");
+  const [showConnect, setShowConnect] = useState(false);
+  const couple = useCouple(userId);
   return (
     <>
-      <main className="screen" key={tab}>
-        {tab === "home" && <Home name={name} onSignOut={onSignOut} />}
+      <main className="screen" key={showConnect ? "connect" : tab}>
+        {showConnect ? <Connect couple={couple} onClose={() => setShowConnect(false)} /> : <>
+        {tab === "home" && <Home name={name} onSignOut={onSignOut} couple={couple} onConnect={() => setShowConnect(true)} />}
         {tab === "word" && <Placeholder title="The Word" note="Scripture journeys, daily devotions and your notes will live here." />}
         {tab === "prayer" && <Placeholder title="Prayer Room" note="Private and shared prayers, with answered-prayer moments." />}
         {tab === "together" && <Placeholder title="Together" note="Relationship exercises, your mentor and your future family journeys." />}
         {tab === "memories" && <Placeholder title="Memories" note="A timeline of moments, milestones and growth." />}
+        </>}
       </main>
-      <BottomNav current={tab} onChange={setTab} />
+      <BottomNav current={tab} onChange={(t) => { setShowConnect(false); setTab(t); }} />
     </>
   );
 }
@@ -56,7 +62,7 @@ export default function App() {
       </>
     );
   } else {
-    body = <MainApp name={profile.first_name} onSignOut={signOut} />;
+    body = <MainApp name={profile.first_name} onSignOut={signOut} userId={session.user.id} />;
   }
 
   return (

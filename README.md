@@ -16,7 +16,3 @@ Push to GitHub. Netlify builds on every push to `main` using `netlify.toml`.
 - Working: app shell, design tokens, light/dark mode, bottom navigation, splash, Home layout.
 - Sample only: Home Scripture card has no Bible text yet.
 - Not built: accounts, database, invitations, notifications, mentor, all feature screens.
-
-git add .
-git commit -m "Phase 3a"
-git push

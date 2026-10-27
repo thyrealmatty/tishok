@@ -1,7 +1,10 @@
 import Button from "../components/Button";
+import type { Couple } from "../lib/useCouple";
 import { greetingFor } from "../lib/greeting";
 
-export default function Home({ name, onSignOut }: { name: string; onSignOut?: () => void }) {
+type Props = { name: string; onSignOut?: () => void; couple?: Couple; onConnect?: () => void };
+
+export default function Home({ name, onSignOut, couple, onConnect }: Props) {
   const { title, subline } = greetingFor();
   const personal = name.trim() ? title.replace(/\.$/, `, ${name.trim()}.`) : title;
 
@@ -9,6 +12,25 @@ export default function Home({ name, onSignOut }: { name: string; onSignOut?: ()
     <>
       <h1 className="greeting">{personal}</h1>
       <p className="subline">{subline}</p>
+
+      {couple && couple.status !== "off" && couple.status !== "loading" && (
+        <section className="card">
+          {couple.status === "connected" ? (
+            <>
+              <h2>Connected with {couple.partner?.first_name ?? "your partner"}</h2>
+              <p>Your shared space is ready.</p>
+            </>
+          ) : (
+            <>
+              <h2>{couple.status === "waiting" ? "Waiting for your partner" : "Connect with your partner"}</h2>
+              <p>{couple.status === "waiting" ? "Your invitation is out. Nothing is shared until they accept." : "Invite them, or join with a code."}</p>
+            </>
+          )}
+          <Button variant="quiet" onClick={onConnect} style={{ marginTop: "0.5rem", paddingLeft: 0 }}>
+            {couple.status === "connected" ? "Manage connection" : "Open"}
+          </Button>
+        </section>
+      )}
 
       <section className="card scripture" aria-labelledby="scripture-h">
         <h2 id="scripture-h">Today’s Scripture</h2>
