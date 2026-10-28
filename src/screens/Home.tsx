@@ -1,11 +1,15 @@
 import Button from "../components/Button";
 import type { Couple } from "../lib/useCouple";
+import { devotionalForDate } from "../lib/devotionals";
 import { greetingFor } from "../lib/greeting";
+import { usePassage } from "../lib/usePassage";
 
-type Props = { name: string; onSignOut?: () => void; couple?: Couple; onConnect?: () => void };
+type Props = { name: string; onSignOut?: () => void; couple?: Couple; onConnect?: () => void; onOpenWord?: () => void };
 
-export default function Home({ name, onSignOut, couple, onConnect }: Props) {
+export default function Home({ name, onSignOut, couple, onConnect, onOpenWord }: Props) {
   const { title, subline } = greetingFor();
+  const d = devotionalForDate(new Date());
+  const passage = usePassage(d.ref);
   const personal = name.trim() ? title.replace(/\.$/, `, ${name.trim()}.`) : title;
 
   return (
@@ -34,17 +38,21 @@ export default function Home({ name, onSignOut, couple, onConnect }: Props) {
 
       <section className="card scripture" aria-labelledby="scripture-h">
         <h2 id="scripture-h">Today’s Scripture</h2>
-        <p className="scripture-ref">Ecclesiastes 4:9–12</p>
-        <p className="scripture-body">
-          The passage text will appear here once a licensed Bible source is connected.
-        </p>
-        <span className="status">Sample mode. No Scripture text is stored yet.</span>
+        <p className="scripture-ref">{d.display}</p>
+        {passage.status === "loading" && <div className="skeleton" aria-hidden="true" />}
+        {passage.status === "ready" && (
+          <>
+            <p className="scripture-body" style={{ whiteSpace: "pre-line" }}>{passage.text}</p>
+            <span className="status">World English Bible, public domain</span>
+          </>
+        )}
+        {passage.status === "error" && <p className="scripture-body">Open your Bible to read this passage today.</p>}
       </section>
 
       <section className="card">
         <h2>Today’s devotional</h2>
-        <p>Loving when it is difficult. About five minutes.</p>
-        <p className="status" style={{ marginTop: "0.75rem" }}>Sample. Devotionals are not built yet.</p>
+        <p>{d.theme}. About five minutes.</p>
+        {onOpenWord && <Button variant="quiet" onClick={onOpenWord} style={{ marginTop: "0.5rem", paddingLeft: 0 }}>Begin</Button>}
       </section>
 
       <section className="card">

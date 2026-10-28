@@ -266,3 +266,7 @@ select.field { appearance: auto; }
 .skeleton { height: 5.5rem; border-radius: var(--radius-card); background: linear-gradient(90deg, var(--surface-line), transparent, var(--surface-line)); background-size: 200% 100%; animation: shimmer 1.6s linear infinite; }
 @keyframes shimmer { to { background-position: -200% 0; } }
 @media (prefers-reduced-motion: reduce) { .prayer.flash, .skeleton { animation: none; } }
+
+/* ---------- The Word ---------- */
+.questions { margin: 0; padding-left: 1.25rem; color: var(--text-soft); }
+.questions li + li { margin-top: var(--space-2); }
