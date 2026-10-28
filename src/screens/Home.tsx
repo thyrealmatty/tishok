@@ -1,12 +1,13 @@
 import Button from "../components/Button";
+import PrayerFocus from "../components/PrayerFocus";
 import type { Couple } from "../lib/useCouple";
 import { devotionalForDate } from "../lib/devotionals";
 import { greetingFor } from "../lib/greeting";
 import { usePassage } from "../lib/usePassage";
 
-type Props = { name: string; onSignOut?: () => void; couple?: Couple; onConnect?: () => void; onOpenWord?: () => void };
+type Props = { name: string; onSignOut?: () => void; couple?: Couple; onConnect?: () => void; onOpenWord?: () => void; userId?: string; onOpenPrayer?: () => void };
 
-export default function Home({ name, onSignOut, couple, onConnect, onOpenWord }: Props) {
+export default function Home({ name, onSignOut, couple, onConnect, onOpenWord, userId, onOpenPrayer }: Props) {
   const { title, subline } = greetingFor();
   const d = devotionalForDate(new Date());
   const passage = usePassage(d.ref);
@@ -48,6 +49,8 @@ export default function Home({ name, onSignOut, couple, onConnect, onOpenWord }:
         )}
         {passage.status === "error" && <p className="scripture-body">Open your Bible to read this passage today.</p>}
       </section>
+
+      {couple && <PrayerFocus userId={userId} couple={couple} onOpenPrayer={onOpenPrayer} />}
 
       <section className="card">
         <h2>Today’s devotional</h2>

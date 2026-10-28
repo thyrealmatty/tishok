@@ -270,3 +270,12 @@ select.field { appearance: auto; }
 /* ---------- The Word ---------- */
 .questions { margin: 0; padding-left: 1.25rem; color: var(--text-soft); }
 .questions li + li { margin-top: var(--space-2); }
+
+/* ---------- Prayer Focus ---------- */
+.focus { background: linear-gradient(165deg, color-mix(in srgb, var(--lavender) 16%, var(--surface)), var(--surface) 70%); transition: background var(--dur-calm) var(--ease); }
+.focus.night { background: linear-gradient(165deg, color-mix(in srgb, var(--plum) 22%, var(--surface)), color-mix(in srgb, var(--lavender) 10%, var(--surface)) 80%); }
+.focus .row .choice { flex: 1; min-height: 2.5rem; text-align: center; }
+.focus .choice[aria-pressed="true"] { border-color: var(--rose); font-weight: 600; background: color-mix(in srgb, var(--rose) 16%, var(--surface)); }
+.focus-title { font-family: var(--font-serif); font-style: italic; font-size: 1.3rem; margin: 0 0 var(--space-3); color: var(--text) !important; }
+.card p.focus-quote { border-left: 2px solid var(--champagne); padding-left: var(--space-3); margin: 0 0 var(--space-3); font-family: var(--font-serif); color: var(--text); }
+.fast { margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--surface-line); }

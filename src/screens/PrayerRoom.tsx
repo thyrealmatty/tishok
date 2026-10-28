@@ -10,6 +10,7 @@ type Prayer = {
 const CATEGORIES = [
   ["general", "General"], ["relationship", "Our relationship"], ["family", "Family"],
   ["gratitude", "Gratitude"], ["guidance", "Guidance"],
+  ["work", "Work and school"], ["health", "Health"], ["growth", "Spiritual growth"],
 ] as const;
 
 const day = (iso: string) =>
