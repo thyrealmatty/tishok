@@ -6,6 +6,7 @@ import Connect from "./screens/Connect";
 import Home from "./screens/Home";
 import Onboarding from "./screens/Onboarding";
 import Placeholder from "./screens/Placeholder";
+import PrayerRoom from "./screens/PrayerRoom";
 import { supabase } from "./lib/supabase";
 import { useAuth } from "./lib/useAuth";
 import { useCouple } from "./lib/useCouple";
@@ -27,7 +28,7 @@ function MainApp({ name, onSignOut, userId }: { name: string; onSignOut?: () => 
         {showConnect ? <Connect couple={couple} onClose={() => setShowConnect(false)} /> : <>
         {tab === "home" && <Home name={name} onSignOut={onSignOut} couple={couple} onConnect={() => setShowConnect(true)} />}
         {tab === "word" && <Placeholder title="The Word" note="Scripture journeys, daily devotions and your notes will live here." />}
-        {tab === "prayer" && <Placeholder title="Prayer Room" note="Private and shared prayers, with answered-prayer moments." />}
+        {tab === "prayer" && (userId ? <PrayerRoom userId={userId} couple={couple} /> : <Placeholder title="Prayer Room" note="Sign in to use the Prayer Room." />)}
         {tab === "together" && <Placeholder title="Together" note="Relationship exercises, your mentor and your future family journeys." />}
         {tab === "memories" && <Placeholder title="Memories" note="A timeline of moments, milestones and growth." />}
         </>}
