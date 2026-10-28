@@ -8,12 +8,30 @@ import type { Couple } from "../lib/useCouple";
 
 type Memory = {
   id: string; owner_id: string; title: string; body: string | null;
-  memory_date: string; category: string; visibility: "private" | "shared";
+  memory_date: string; category: string; visibility: "private" | "shared"; photo_path: string | null;
 };
 const CATEGORIES = [
   ["moment", "Moment"], ["milestone", "Milestone"], ["testimony", "Testimony"],
   ["note", "Note to each other"], ["hope", "Future hope"], ["answered", "Answered prayer"],
 ] as const;
+
+const BUCKET = "memory-photos";
+
+// Checks the file, then shrinks it to at most 1600px and re-encodes as JPEG to save space.
+async function preparePhoto(file: File): Promise<Blob> {
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type))
+    throw new Error("Please choose a JPEG, PNG or WebP photo.");
+  if (file.size > 15 * 1024 * 1024) throw new Error("That photo is too large. Choose one under 15 MB.");
+  const bmp = await createImageBitmap(file);
+  const scale = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bmp.width * scale);
+  canvas.height = Math.round(bmp.height * scale);
+  canvas.getContext("2d")!.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+  const blob = await new Promise<Blob | null>((res) => canvas.toBlob(res, "image/jpeg", 0.82));
+  if (!blob) throw new Error("That photo could not be processed.");
+  return blob;
+}
 
 const fmt = (d: string) =>
   new Date(`${d}T00:00:00`).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
@@ -29,6 +47,9 @@ export default function Memories({ userId, couple }: { userId?: string; couple: 
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [fileKey, setFileKey] = useState(0);
+  const [urls, setUrls] = useState<Record<string, string>>({});
 
   const partner = couple.partner?.first_name ?? "your partner";
   const canShare = couple.status === "connected";
@@ -36,7 +57,7 @@ export default function Memories({ userId, couple }: { userId?: string; couple: 
   const load = useCallback(async () => {
     if (!supabase || !userId) return;
     const { data, error } = await supabase.from("memories")
-      .select("id, owner_id, title, body, memory_date, category, visibility")
+      .select("id, owner_id, title, body, memory_date, category, visibility, photo_path")
       .order("memory_date", { ascending: false }).order("created_at", { ascending: false });
     if (error) setMessage(error.message);
     else setItems(data as Memory[]);
@@ -49,23 +70,56 @@ export default function Memories({ userId, couple }: { userId?: string; couple: 
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [load]);
 
-  async function save() {
-    if (!supabase || !title.trim()) return;
-    setBusy(true); setMessage(null);
-    const { error } = await supabase.from("memories").insert({
-      title: title.trim(), body: body.trim() || null, memory_date: date, category,
-      visibility: shared && canShare ? "shared" : "private",
+  // Photos are private. We ask for short-lived links that only work for people allowed to see the memory.
+  useEffect(() => {
+    const paths = (items ?? []).map((m) => m.photo_path).filter((x): x is string => Boolean(x));
+    if (!supabase || paths.length === 0) return;
+    supabase.storage.from(BUCKET).createSignedUrls(paths, 3600).then(({ data }) => {
+      const map: Record<string, string> = {};
+      data?.forEach((d) => { if (d.path && d.signedUrl) map[d.path] = d.signedUrl; });
+      setUrls(map);
     });
-    if (error) setMessage(error.message); // your words stay in the box if saving fails
-    else { setTitle(""); setBody(""); setMessage("Saved to your timeline."); await load(); }
+  }, [items]);
+
+  async function save() {
+    if (!supabase || !userId || !title.trim()) return;
+    setBusy(true); setMessage(null);
+    let photoPath: string | null = null;
+    try {
+      if (file) {
+        const blob = await preparePhoto(file);
+        photoPath = `${userId}/${crypto.randomUUID()}.jpg`;
+        const { error: upErr } = await supabase.storage.from(BUCKET).upload(photoPath, blob, { contentType: "image/jpeg" });
+        if (upErr) throw upErr;
+      }
+      const { error } = await supabase.from("memories").insert({
+        title: title.trim(), body: body.trim() || null, memory_date: date, category,
+        visibility: shared && canShare ? "shared" : "private", photo_path: photoPath,
+      });
+      if (error) {
+        if (photoPath) await supabase.storage.from(BUCKET).remove([photoPath]);
+        throw error;
+      }
+      setTitle(""); setBody(""); setFile(null); setFileKey((k) => k + 1);
+      setMessage("Saved to your timeline.");
+      await load();
+    } catch (e) {
+      // your words stay in the boxes if saving fails
+      setMessage((e as { message?: string })?.message ?? "Something went wrong. Please try again.");
+    }
     setBusy(false);
   }
 
   async function remove(id: string) {
     if (!supabase) return;
+    const path = items?.find((m) => m.id === id)?.photo_path;
     const { error } = await supabase.from("memories").delete().eq("id", id);
     if (error) setMessage(error.message);
-    else { setConfirmDelete(null); await load(); }
+    else {
+      if (path) await supabase.storage.from(BUCKET).remove([path]);
+      setConfirmDelete(null);
+      await load();
+    }
   }
 
   const who = (m: Memory) =>
@@ -106,7 +160,10 @@ export default function Memories({ userId, couple }: { userId?: string; couple: 
           </button>
         </div>
         {message && <p className="status" role="status" style={{ marginTop: "0.75rem" }}>{message}</p>}
-        <p className="status" style={{ marginTop: "0.5rem" }}>Photos are not available yet.</p>
+        <input key={fileKey} className="field" type="file" accept="image/jpeg,image/png,image/webp"
+          aria-label="Photo (optional)" style={{ marginTop: "0.75rem", paddingTop: "0.7rem" }}
+          onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+        <p className="status">Optional photo. It is stored privately and resized to save space.</p>
         <div className="actions"><Button disabled={busy || !title.trim() || !date} onClick={save}>Save memory</Button></div>
       </section>
 
@@ -127,6 +184,7 @@ export default function Memories({ userId, couple }: { userId?: string; couple: 
             <span>{who(m)}</span>
           </div>
           <h2 style={{ marginTop: "0.5rem" }}>{m.title}</h2>
+          {m.photo_path && urls[m.photo_path] && <img className="photo" src={urls[m.photo_path]} alt={m.title} loading="lazy" />}
           {m.body && <p className="prayer-body">{m.body}</p>}
           {m.owner_id === userId && (
             <div className="row" style={{ marginTop: "0.5rem" }}>
