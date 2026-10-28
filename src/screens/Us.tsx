@@ -45,9 +45,6 @@ export default function Us({ userId, couple }: { userId?: string; couple: Couple
 
   return (
     <>
-      <h1 className="greeting">Together</h1>
-      <p className="subline">Small, honest conversations. You decide what gets shared.</p>
-
       <section className={`card ${done ? "answered" : ""} ${flash ? "flash" : ""}`}>
         <p className="status">{q.kind} · today’s question</p>
         <p className="scripture-ref" style={{ marginTop: "0.5rem" }}>{q.text}</p>
@@ -120,7 +117,7 @@ export default function Us({ userId, couple }: { userId?: string; couple: Couple
         </p>
       </details>
 
-      <p className="status">Your mentor and Future Family journeys are not built yet. They are planned for later phases.</p>
+      <p className="status">Your mentor is not built yet. It is planned for a later phase.</p>
     </>
   );
 }
