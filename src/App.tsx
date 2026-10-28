@@ -9,6 +9,7 @@ import Placeholder from "./screens/Placeholder";
 import PrayerRoom from "./screens/PrayerRoom";
 import Word from "./screens/Word";
 import Us from "./screens/Us";
+import Memories from "./screens/Memories";
 import { supabase } from "./lib/supabase";
 import { useAuth } from "./lib/useAuth";
 import { useCouple } from "./lib/useCouple";
@@ -32,7 +33,7 @@ function MainApp({ name, onSignOut, userId }: { name: string; onSignOut?: () => 
         {tab === "word" && <Word userId={userId} couple={couple} />}
         {tab === "prayer" && (userId ? <PrayerRoom userId={userId} couple={couple} /> : <Placeholder title="Prayer Room" note="Sign in to use the Prayer Room." />)}
         {tab === "together" && <Us userId={userId} couple={couple} />}
-        {tab === "memories" && <Placeholder title="Memories" note="A timeline of moments, milestones and growth." />}
+        {tab === "memories" && <Memories userId={userId} couple={couple} />}
         </>}
       </main>
       <BottomNav current={tab} onChange={(t) => { setShowConnect(false); setTab(t); }} />

@@ -1,8 +1,10 @@
 import Button from "../components/Button";
+import GrowthWeek from "../components/GrowthWeek";
 import PrayerFocus from "../components/PrayerFocus";
 import type { Couple } from "../lib/useCouple";
 import { devotionalForDate } from "../lib/devotionals";
 import { greetingFor } from "../lib/greeting";
+import { useGrowth } from "../lib/useGrowth";
 import { usePassage } from "../lib/usePassage";
 
 type Props = { name: string; onSignOut?: () => void; couple?: Couple; onConnect?: () => void; onOpenWord?: () => void; userId?: string; onOpenPrayer?: () => void };
@@ -11,6 +13,7 @@ export default function Home({ name, onSignOut, couple, onConnect, onOpenWord, u
   const { title, subline } = greetingFor();
   const d = devotionalForDate(new Date());
   const passage = usePassage(d.ref);
+  const growth = useGrowth(userId);
   const personal = name.trim() ? title.replace(/\.$/, `, ${name.trim()}.`) : title;
 
   return (
@@ -58,13 +61,7 @@ export default function Home({ name, onSignOut, couple, onConnect, onOpenWord, u
         {onOpenWord && <Button variant="quiet" onClick={onOpenWord} style={{ marginTop: "0.5rem", paddingLeft: 0 }}>Begin</Button>}
       </section>
 
-      <section className="card">
-        <h2>Your growth</h2>
-        <div className="bar" role="img" aria-label="Sample progress: 3 of 7 days">
-          <span style={{ width: "43%" }} />
-        </div>
-        <p style={{ marginTop: "0.75rem" }}>Three days this week. Every day counts, and missed days are fine.</p>
-      </section>
+      {userId && <GrowthWeek growth={growth} />}
 
       <section className="card empty">
         <h2>Your first shared memory</h2>
