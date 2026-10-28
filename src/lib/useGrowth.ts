@@ -28,10 +28,11 @@ export function useGrowth(userId?: string): Growth {
       supabase.from("us_answers").select("entry_date, owner_id").gte("entry_date", start),
       supabase.from("prayers").select("created_at, owner_id").gte("created_at", startIso),
     ]);
-    const mine = (rows: { owner_id: string }[] | null) => (rows ?? []).filter((r) => r.owner_id === userId);
-    const devs = mine(dev.data) as { entry_date: string }[];
-    const uss = mine(us.data) as { entry_date: string }[];
-    const prs = mine(pr.data) as { created_at: string }[];
+    const mine = <T extends { owner_id: string }>(rows: T[] | null): T[] =>
+      (rows ?? []).filter((r) => r.owner_id === userId);
+    const devs = mine<{ owner_id: string; entry_date: string }>(dev.data);
+    const uss = mine<{ owner_id: string; entry_date: string }>(us.data);
+    const prs = mine<{ owner_id: string; created_at: string }>(pr.data);
     const active = new Set<string>([
       ...devs.map((x) => x.entry_date), ...uss.map((x) => x.entry_date),
       ...prs.map((x) => todayKey(new Date(x.created_at))),
