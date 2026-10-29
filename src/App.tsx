@@ -1,6 +1,7 @@
 import { useState } from "react";
 import BottomNav, { type TabId } from "./components/BottomNav";
 import Logo from "./components/Logo";
+import OfflineBanner from "./components/OfflineBanner";
 import Auth from "./screens/Auth";
 import Connect from "./screens/Connect";
 import Home from "./screens/Home";
@@ -72,6 +73,7 @@ export default function App() {
   return (
     <div className="shell">
       <div className="ambient" aria-hidden="true" />
+      <OfflineBanner />
       <div className="splash" aria-hidden="true"><Logo /></div>
       {body}
     </div>

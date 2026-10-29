@@ -1,5 +1,6 @@
 import Button from "../components/Button";
 import GrowthWeek from "../components/GrowthWeek";
+import InstallHint from "../components/InstallHint";
 import PrayerFocus from "../components/PrayerFocus";
 import type { Couple } from "../lib/useCouple";
 import { devotionalForDate } from "../lib/devotionals";
@@ -67,6 +68,8 @@ export default function Home({ name, onSignOut, couple, onConnect, onOpenWord, u
         <h2>Your first shared memory</h2>
         <p>When you and your partner add a memory, it will live here. Start with a moment you are thankful for.</p>
       </section>
+      <InstallHint />
+
       {onSignOut && <Button variant="quiet" onClick={onSignOut} style={{ marginTop: "1.5rem" }}>Sign out</Button>}
     </>
   );

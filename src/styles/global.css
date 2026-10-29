@@ -299,3 +299,12 @@ details.card[open] summary { margin-bottom: var(--space-3); }
 .seg { margin-bottom: var(--space-4); }
 .seg .choice { flex: 1; text-align: center; min-height: 2.75rem; }
 .choice[aria-pressed="true"] { border-color: var(--rose); font-weight: 600; background: color-mix(in srgb, var(--rose) 16%, var(--surface)); }
+
+/* ---------- Offline banner ---------- */
+.offline {
+  position: fixed; z-index: 9; left: 50%; transform: translateX(-50%);
+  top: calc(var(--space-3) + env(safe-area-inset-top));
+  width: min(30rem, calc(100% - 1.5rem)); padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-control); font-size: 0.9rem;
+  background: var(--plum); color: var(--ivory); box-shadow: var(--shadow-soft);
+}
